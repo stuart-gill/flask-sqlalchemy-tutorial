@@ -12,7 +12,6 @@ create_item_table = "CREATE TABLE IF NOT EXISTS items (id INTEGER NOT NULL PRIMA
 
 cursor.execute(create_item_table)
 
-cursor.execute("INSERT INTO items (name, price) VALUES ('test item', 10.99)")
 connection.commit()
 
 connection.close()
