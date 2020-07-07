@@ -24,6 +24,26 @@ class Item(Resource):
         if row:
             return {"item": {"name": row[1], "price": row[2]}}
 
+    @classmethod
+    def insert(cls, item):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+
+        query = "INSERT INTO items (name, price) VALUES (?,?)"
+        cursor.execute(query, (item["name"], item["price"]))
+        connection.commit()
+        connection.close()
+
+    @classmethod
+    def update(cls, item):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+
+        query = "UPDATE items SET price = ? WHERE name = ?"
+        cursor.execute(query, (item["price"], item["name"]))
+        connection.commit()
+        connection.close()
+
     @jwt_required()
     def get(self, name):
         item = self.find_by_name(name)
@@ -38,13 +58,10 @@ class Item(Resource):
         data = Item.parser.parse_args()
         item = {"name": name, "price": data["price"]}
 
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
-
-        query = "INSERT INTO items (name, price) VALUES (?,?)"
-        cursor.execute(query, (item["name"], item["price"]))
-        connection.commit()
-        connection.close()
+        try:
+            self.insert(item)
+        except:
+            return {"message": "an error occured while trying to post the item"}, 500
 
         # note: we always have to return json
         return item, 201
@@ -68,13 +85,20 @@ class Item(Resource):
 
         data = Item.parser.parse_args()
 
-        item = next((item for item in items if item["name"] == name), None)
+        item = self.find_by_name(name)
+        updated_item = {"name": name, "price": data["price"]}
+
         if item:
-            item.update(data)
+            try:
+                self.update(updated_item)
+            except:
+                return {"message": "an error occurred updating the item"}, 500
         else:
-            item = {"name": name, "price": data["price"]}
-            items.append(item)
-        return item
+            try:
+                self.insert(updated_item)
+            except:
+                return {"message": "an error occured inserting the item"}, 500
+        return updated_item
 
 
 class ItemList(Resource):
