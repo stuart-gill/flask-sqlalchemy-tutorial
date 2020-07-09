@@ -1,3 +1,5 @@
+# This file no longer necesseary, SQLAlchemy creates tables in app.py
+
 import sqlite3
 
 connection = sqlite3.connect("data.db")

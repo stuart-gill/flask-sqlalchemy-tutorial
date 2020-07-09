@@ -14,6 +14,12 @@ app.config["SQLALCHEMY_TRACK_NOTIFICATIONS"] = False
 app.secret_key = "stuart"
 api = Api(app)
 
+# these 3 lines create the database file (data.db as listed above) and all tables
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+
 jwt = JWT(
     app, authenticate, identity
 )  # JWT will create /auth endpoint... that endpoint will return JWT token
