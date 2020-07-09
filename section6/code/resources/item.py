@@ -6,12 +6,17 @@ from models.item import ItemModel
 # resources used to map endpoints (like get, post) to /item/name or whatever
 # anything not called by an API directly shouldn't be a resource but a model
 
+# resources use models to interpret data pulled from database... models stand on their own
+
 
 class Item(Resource):
 
     parser = reqparse.RequestParser()
     parser.add_argument(
         "price", type=float, required=True, help="This field cannot be left blank!"
+    )
+    parser.add_argument(
+        "store_id", type=int, required=True, help="Every item needs a store_id!"
     )
 
     @jwt_required()
@@ -26,7 +31,7 @@ class Item(Resource):
             return {"message": f"an item with name {name} already exists"}, 400
 
         data = Item.parser.parse_args()
-        item = ItemModel(name, data["price"])
+        item = ItemModel(name, data["price"], data["store_id"])
 
         try:
             item.upsert()
@@ -55,11 +60,14 @@ class Item(Resource):
         if item:
             try:
                 item.price = data["price"]
+                item.store_id = data["store_id"]
             except:
                 return {"message": "an error occurred updating the item"}, 500
         else:
             try:
-                item = ItemModel(name, data["price"])
+                item = ItemModel(
+                    name, **data
+                )  # expands to data["price"], data["store_id"]
                 item.upsert()
             except:
                 return {"message": "an error occured inserting the item"}, 500

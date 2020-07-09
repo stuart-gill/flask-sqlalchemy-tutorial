@@ -5,6 +5,7 @@ from flask_jwt import JWT
 from security import authenticate, identity
 from resources.user import UserRegister
 from resources.item import Item, ItemList
+from resources.store import Store, StoreList
 from db import db
 
 app = Flask(__name__)
@@ -24,10 +25,13 @@ jwt = JWT(
     app, authenticate, identity
 )  # JWT will create /auth endpoint... that endpoint will return JWT token
 
-
+api.add_resource(Store, "/store/<string:name>")
 api.add_resource(Item, "/item/<string:name>")
 api.add_resource(ItemList, "/items")
+api.add_resource(StoreList, "/stores")
+
 api.add_resource(UserRegister, "/register")
+
 
 # conditional ensures that app is only run when we run app.py, and not if/when we import it to another file
 # only the file you directly run is __main__
