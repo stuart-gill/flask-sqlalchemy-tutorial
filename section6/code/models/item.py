@@ -1,4 +1,3 @@
-import sqlite3
 from db import db
 
 
@@ -21,7 +20,7 @@ class ItemModel(db.Model):
         # this line replaces everything below
         return cls.query.filter_by(
             name=name
-        ).first()  # gets first row, converts row to ItemModel object and returns that
+        ).first()  # gets first row, converts row to ItemModel object and returns that. Query is part of sqlalchemy
 
         # connection = sqlite3.connect("data.db")
         # cursor = connection.cursor()
@@ -34,20 +33,26 @@ class ItemModel(db.Model):
         # if row:
         #     return cls(name=row[1], price=row[2])
 
-    def insert(self):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+    def upsert(self):  # works for both insert and update functions
+        db.session.add(self)
+        db.session.commit()
 
-        query = "INSERT INTO items (name, price) VALUES (?,?)"
-        cursor.execute(query, (self.name, self.price))
-        connection.commit()
-        connection.close()
+        # connection = sqlite3.connect("data.db")
+        # cursor = connection.cursor()
 
-    def update(self):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+        # query = "INSERT INTO items (name, price) VALUES (?,?)"
+        # cursor.execute(query, (self.name, self.price))
+        # connection.commit()
+        # connection.close()
 
-        query = "UPDATE items SET price = ? WHERE name = ?"
-        cursor.execute(query, (self.price, self.name))
-        connection.commit()
-        connection.close()
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+        # connection = sqlite3.connect("data.db")
+        # cursor = connection.cursor()
+
+        # query = "UPDATE items SET price = ? WHERE name = ?"
+        # cursor.execute(query, (self.price, self.name))
+        # connection.commit()
+        # connection.close()
