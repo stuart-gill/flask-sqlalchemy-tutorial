@@ -8,6 +8,7 @@ from resources.item import Item, ItemList
 from db import db
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 # confusing-- I think this keep flask from tracking changes but lets SQLalchemy do it??
 app.config["SQLALCHEMY_TRACK_NOTIFICATIONS"] = False
 app.secret_key = "stuart"

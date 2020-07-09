@@ -31,7 +31,7 @@ class Item(Resource):
         item = ItemModel(name, data["price"])
 
         try:
-            item.insert()
+            item.upsert()
         except:
             return {"message": "an error occured while trying to post the item"}, 500
 
@@ -44,12 +44,7 @@ class Item(Resource):
         # items = [item for item in items if item["name"] != name]
         item = ItemModel.find_by_name(name)
         if item:
-            connection = sqlite3.connect("data.db")
-            cursor = connection.cursor()
-            query = "DELETE FROM items WHERE name = ?"
-            cursor.execute(query, (name,))
-            connection.commit()
-            connection.close()
+            item.delete()
             return {"message": "item deleted"}
         return {"message": "item not found"}, 404
 
@@ -58,19 +53,20 @@ class Item(Resource):
         data = Item.parser.parse_args()
 
         item = ItemModel.find_by_name(name)
-        updated_item = ItemModel(name, data["price"])
 
         if item:
             try:
-                updated_item.update()
+                item.price = data["price"]
             except:
                 return {"message": "an error occurred updating the item"}, 500
         else:
             try:
-                updated_item.insert()
+                item = ItemModel(name, data["price"])
+                item.upsert()
             except:
                 return {"message": "an error occured inserting the item"}, 500
-        return updated_item.json()
+        item.upsert()
+        return item.json()
 
 
 class ItemList(Resource):
