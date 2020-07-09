@@ -18,16 +18,21 @@ class ItemModel(db.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+        # this line replaces everything below
+        return cls.query.filter_by(
+            name=name
+        ).first()  # gets first row, converts row to ItemModel object and returns that
 
-        query = "SELECT * FROM items WHERE name = ?"
-        result = cursor.execute(query, (name,))
-        row = result.fetchone()
-        connection.close()
+        # connection = sqlite3.connect("data.db")
+        # cursor = connection.cursor()
 
-        if row:
-            return cls(name=row[1], price=row[2])
+        # query = "SELECT * FROM items WHERE name = ?"
+        # result = cursor.execute(query, (name,))
+        # row = result.fetchone()
+        # connection.close()
+
+        # if row:
+        #     return cls(name=row[1], price=row[2])
 
     def insert(self):
         connection = sqlite3.connect("data.db")
