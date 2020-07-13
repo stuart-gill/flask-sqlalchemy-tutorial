@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_restful import Api
 from flask_jwt import JWT
@@ -9,7 +11,9 @@ from resources.store import Store, StoreList
 
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", "sqlite:///data.db"
+)  # reads database_url from heroku, or defaults to data.db if run locally
 # confusing-- I think this keep flask from tracking changes but lets SQLalchemy do it??
 app.config["SQLALCHEMY_TRACK_NOTIFICATIONS"] = False
 app.secret_key = "stuart"
